@@ -8,10 +8,16 @@ in this repo we provide some functions that you would use to save time
 ## Checking for Missing Values
 
 ~~~python
+import pandas as pd
+
 (df.isnull().sum()*100 / df.shape[0]).sort_values(ascending = False).head(15).to_frame('nan_percent')
 ~~~
 ## Visualize Feature Distributions
 ~~~python
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 def feature_dist(data):
     fig = plt.figure(figsize = (15, 60))
     for i in range(len(data.columns.tolist())):
@@ -32,6 +38,10 @@ def feature_dist(data):
 
 ## Correlation Matrix
 ~~~python
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 def correlation_heatmap(df):
     _ , ax = plt.subplots(figsize =(14, 12))
     colormap = sns.diverging_palette(220, 10, as_cmap = True)
@@ -53,6 +63,12 @@ correlation_heatmap(data)
 ~~~
 ## Evaluation of classification models
 ~~~python
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import learning_curve
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
 def evaluation(model):
     
     model.fit(X_train, y_train)
