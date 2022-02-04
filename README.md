@@ -102,7 +102,7 @@ for fold, (tr_index , val_index) in enumerate(kf.split(train)):
     model = LinearRegression()
     model.fit(x_train, y_train, eval_set = eval_set, verbose = False)
     
-    train_preds = model.predict(x_train)    
+    train_preds = model.predict(x_train)
     val_preds = model.predict(x_val)
     
     print(np.sqrt(mean_squared_error(y_val, val_preds)))
@@ -216,5 +216,27 @@ def objective(trial):
 study = optuna.create_study(direction='maximize')
 study.optimize(objective, n_trials=500)
 ~~~
+
+## Put a jupyter notebook in docker
+
+~~~dockerfile
+FROM python:3.9.1
+
+EXPOSE 8888
+ENV PYTHONUNBUFFERED True
+
+ENV APP_HOME /app
+WORKDIR $APP_HOME
+COPY . ./
+
+RUN apt-get update
+RUN pip install jupyter jupyterlab
+RUN pip install requirements.txt
+
+CMD [ "jupyter-lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root" ]
+
+~~~
+
+
 
 
