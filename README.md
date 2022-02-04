@@ -91,4 +91,73 @@ def evaluation(model):
     plt.show()
 ~~~
 
+## Hyperparametres optimization
+
+~~~python
+import optuna
+import pandas as pd
+import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+import xgboost as xgb
+from sklearn.metrics import accuracy_score
+
+def objective(trial):
+    # define the models and the parametres spaces for each model    
+    classifier_name = trial.suggest_categorical('classifier', ['DecisionTreeClassifier', 
+                                                               'RandomForestClassifier', 
+                                                               'LogisticRegression', 
+                                                               'KNeighborsClassifier',
+                                                               'XGBClassifier'])
+    if classifier_name == 'DecisionTreeClassifier':
+        max_depth = trial.suggest_int("max_depth", 2, 612)
+        min_samples_split = trial.suggest_int("min_samples_split", 2, 612)
+        max_leaf_nodes = int(trial.suggest_int("max_leaf_nodes", 2, 612))
+        criterion = trial.suggest_categorical("criterion", ["gini", "entropy"])
+        classifier_obj = DecisionTreeClassifier(criterion = criterion, 
+                                                max_depth = max_depth, 
+                                                min_samples_split = min_samples_split,
+                                                max_leaf_nodes = max_leaf_nodes)
+    elif classifier_name == 'RandomForestClassifier':
+        n_estimators = trial.suggest_int('n_estimators', 50, 1000)
+        max_depth = trial.suggest_int('max_depth', 4, 50)
+        min_samples_split = trial.suggest_int('min_samples_split', 1, 150)
+        min_samples_leaf = trial.suggest_int('min_samples_leaf', 1, 60)
+        classifier_obj = RandomForestClassifier(n_estimators = n_estimators,
+                                                max_depth = max_depth,
+                                                min_samples_split = min_samples_split,
+                                                min_samples_leaf = min_samples_leaf)
+    elif classifier_name == 'LogisticRegression':
+        tol = trial.suggest_uniform('tol' , 1e-6 , 1e-3)
+        C = trial.suggest_loguniform("C", 1e-2, 1)
+        fit_intercept = trial.suggest_categorical('fit_intercept' , [True, False])
+        solver = trial.suggest_categorical('solver' , ['lbfgs','liblinear'])
+        classifier_obj = LogisticRegression(tol = tol, C = C, fit_intercept = fit_intercept, solver = solver)
+    elif classifier_name == "XGBClassifier":
+        params = {'objective' : 'binary:logistic',
+              'learning_rate' : trial.suggest_float("learning_rate", 0.01, 0.8),
+              'n_estimators' : trial.suggest_int("n_estimators", 100, 1000),
+              'max_depth' : trial.suggest_int("max_depth", 2, 600),
+              'min_child_weight' : trial.suggest_int("min_child_weight", 1, 20),
+              'gamma' : trial.suggest_float("gamma", 0.1, 1),
+              'subsample' : trial.suggest_float("subsample", 0.1, 1),
+              'colsample_bytree' : trial.suggest_float("colsample_bytree", 0.1, 1)
+             }
+        classifier_obj = xgb.XGBClassifier(**params)
+    else:
+        n_neighbors = trial.suggest_int("n_neighbors", 1, 30)
+        weights = trial.suggest_categorical("weights", ['uniform', 'distance'])
+        metric = trial.suggest_categorical("metric", ['euclidean', 'manhattan', 'minkowski'])
+        classifier_obj = KNeighborsClassifier(n_neighbors = n_neighbors, weights = weights, metric = metric)
+    score = cross_val_score(classifier_obj, X_train, y_train, n_jobs=-1, cv=3)
+    accuracy = score.mean()
+    return accuracy
+
+# Create a study object and optimize the objective function.
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=500)
+~~~
+
 
