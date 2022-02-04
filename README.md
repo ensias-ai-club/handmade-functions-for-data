@@ -2,8 +2,16 @@
 
 > In progress
 
-There is alot of functions and commands that you would use frequently when analyzing data
-in this repo we provide some functions that you would use to save time
+There is alot of functions and commands that you would use frequently when analyzing data for example :
+* Checking for missing values
+* Scaling features
+* Feature Correlations
+* Cross Validation
+* Evaluation of models
+
+in this repo we provide some functions that you would use to save time.
+
+> some of these functions require some tweaking according to the situation
 
 ## Checking for Missing Values
 
@@ -36,6 +44,16 @@ def feature_dist(data):
     plt.show()
 ~~~
 
+## Scaling Features
+~~~python
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+train[features] = scaler.fit_transform(train[features])
+test[features] = scaler.transform(test[features])
+~~~
+
 ## Correlation Matrix
 ~~~python
 import pandas as pd
@@ -61,6 +79,45 @@ def correlation_heatmap(df):
 
 correlation_heatmap(data)
 ~~~
+## Cross Validation
+~~~python
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import KFold
+from sklearn.metrics import *
+from sklearn.linear_model import LinearRegression
+
+kf = KFold(n_splits=10, shuffle=True, random_state=42)
+for fold, (tr_index , val_index) in enumerate(kf.split(train)):
+    
+    print("⁙" * 10)
+    print(f"Fold {fold + 1}")
+    
+    x_train,x_val = x.values[tr_index] , x.values[val_index]
+    y_train,y_val = y.values[tr_index] , y.values[val_index]
+        
+    eval_set = [(x_val, y_val)]
+    
+    model = LinearRegression()
+    model.fit(x_train, y_train, eval_set = eval_set, verbose = False)
+    
+    train_preds = model.predict(x_train)    
+    val_preds = model.predict(x_val)
+    
+    print(np.sqrt(mean_squared_error(y_val, val_preds)))
+    
+    if test_preds is None:
+        test_preds = model.predict(test.values)
+    else:
+        test_preds += model.predict(test.values)
+
+print("-" * 50)
+print("\033[95mTraining Done")
+
+test_preds /= 10
+~~~
+
 ## Evaluation of classification models
 ~~~python
 import pandas as pd
