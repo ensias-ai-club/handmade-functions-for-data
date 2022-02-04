@@ -13,6 +13,18 @@ in this repo we provide some functions that you would use to save time.
 
 > some of these functions require some tweaking according to the situation
 
+## Table of Contents
+
+* [Checking for Missing Values](#checking-for-missing-values)
+* [Visualize Feature Distributions](#visualize-feature-distributions)
+* [Scaling Features](#scaling-features)
+* [Correlation Matrix](#correlation-matrix)
+* [Cross Validation](#cross-validation)
+* [Evalution of classification models](#evaluation-of-classification-models)
+* [Hyperparametres optimization](#hyperparametres-optimization)
+* [Put a jupyter notebook in docker](#put-a-jupyter-notebook-in-docker)
+
+
 ## Checking for Missing Values
 
 ~~~python
